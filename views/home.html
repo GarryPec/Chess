@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<!--
+	This file is rendered by express.js, when the rurl /chat/123456 is visited in a browser.
+	It includes jQuery, socket.io.js (it is automatically served by the socket.io library), 
+	and a few more JavaScript files that you should check out.
+-->
+
+<html>
+
+<head>
+
+	<title>Welcome to you</title>
+	<meta charset="UTF-32">
+	<link type="text/css" rel="stylesheet" href="../css/stylesheet.css" />
+	<link href="http://fonts.googleapis.com/css?family=Open+Sans Condensed:300italic,300,700" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<!-- BEGIN CHESS STYLE CSS -->
+	<link rel="stylesheet" type="text/css" href="../chess-assets/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../chess-assets/css/style.css">
+	<!-- END CHESS STYLE CSS -->
+</head>
+
+<body>
+	<div class="connected">
+		<div class="container">
+			<h2>Sign Up</h2>
+			<form class="loginForm">
+				<div class="form-group">
+				<!-- <label for="yourName">Name:</label> -->
+				<input type="text" class="form-control" id="yourName" placeholder="Enter name">
+				</div>
+				<div class="form-group">
+				<!-- <label for="yourEmail">Email:</label> -->
+				<input type="text" class="form-control" id="yourEmail" placeholder="Enter email">
+				</div>
+				<div class="checkbox">
+				<label><input type="checkbox"> Remember me</label>
+				</div>
+				<button type="submit" class="btn btn-primary">ENTER</button>
+			</form>
+		</div>
+			<!-- <form class="loginForm">
+				<input type="text" id="yourName" placeholder="Your nick name" /><br/>
+				<input type="text" id="yourEmail" placeholder="Your email address" /><br/>
+				<input type="submit" id="yourEnter" value="ENTER" />
+			</form>
+
+		</div> -->
+
+	</div>
+	<section id="gamebody">
+
+		<!-- These elements are displayed as white info cards in the middle of the screen -->
+
+
+		<div class="personinside">
+
+			<img src="../img/unnamed.jpg" id="ownerImage" />
+
+			<div class="infoInside">
+				<h2>Play chess game with <span class="nickname-chat"></span></h2>
+				<br/>
+
+				<form class="loginForm">
+					<input type="text" id="hisName" placeholder="Your nick name" /><br/>
+					<input type="text" id="hisEmail" placeholder="Your email address" /><br/>
+					<input type="submit" id="hisEnter" value="ENTER" />
+				</form>
+
+			</div>
+
+		</div>
+
+		<div class="invite-textfield">
+
+			<h2>Oops, there are no other people in this chat!</h2>
+			<h5>Invite a friend by sending them this URL</h5>
+
+			<div class="link">
+				<a title="Invite a friend" href="" id="link"></a>
+			</div>
+
+		</div>
+
+		<div class="left">
+
+			<img src="../img/unnamed.jpg" id="leftImage" />
+
+			<div class="info">
+				<h2><span class="nickname-left"></span> has left this chat.</h2>
+				<h5>Invite somebody else by sending them this page.</h5>
+			</div>
+
+		</div>
+
+		<div class="toomanypeople">
+
+			<h2>Oops, you can not join this chat!</h2>
+			<h5>There are already two people in it. Would you like to create a <a title="New Room" href="/create" id="room">new room</a>?</h5>
+
+		</div>
+
+		<div class="chatscreen">
+
+			<ul class="chats">
+				<!-- The chat messages will go here -->
+			</ul>
+
+		</div>
+		<div class="homesection row">
+			<div class="action-layout col-sm-2">
+				<a title="Create" id="create">
+					<div id="createbutton" class="btn btn-primary">
+						<div id="big">Create Game</div>
+					</div>
+				</a>
+			</div>
+			<div class="chess-layout col-sm-6">
+			<!-- BEGIN CHESS CONTAINER -->
+				<div class="chess-container">
+					<div class="option-nav" style="display: flex;">
+						<div id="player-nav">
+							Player: <span id="player"></span>
+						</div>
+						<span id="back-btn" class="button">BACK</span>
+						<span id="restart-btn" class="button">NEW GAME</span>
+						<!-- <div id="option" class="btn">
+							<i class="fa fa-cog" aria-hidden="true"></i>
+							<span class="tooltiptext">OPTION</span>
+						</div>
+						<div id="undo-btn" class="btn">
+							<i class="fa fa-undo" aria-hidden="true"></i>
+							<span class="tooltiptext">UNDO</span>
+						</div> -->
+					</div>
+					<div id="board">
+						<div id="result" class="hide"></div>
+						<div id="pawn-promotion-option" class="hide">
+							 <span id="queen" class="option"></span>
+							 <span id="rook" class="option"></span>
+							 <span id="knight" class="option"></span>
+							 <span id="bishop" class="option"></span>
+						</div>
+						<div id="option-menu" class="hide">
+							 <div id="back-btn" class="button">BACK</div>
+							 <div id="theme-menu">
+								 THEME: <span id="theme-option" class="button"></span>
+							 </div>
+							 <div id="color-menu">
+								 COLOR: <span id="color-option" class="button"></span>
+							 </div>
+							 <div id="restart-btn" class="button">NEW GAME</div>
+						</div>
+						<div id="game_wrap">
+							<div id="game" ng-app="myApp" ng-controller="GameController">
+								 <div class="row" ng-repeat="y in widths">
+									  <div ondrop="drop(event)" ondragover="allowDrop(event)"  class="box" ng-repeat="x in widths" ng-attr-id="{{'box-' + x + '-' + y}}" piece="">
+									  </div>
+								 </div>
+							</div>
+						</div>
+					</div>
+					<div id="addboxlist">
+						<span id="addpawn" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+						<span id="addqueen" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+						<span id="addrook" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box" ></span>
+						<span id="addknight" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+						<span id="addbknight" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+						<span id="addbishop" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+						<span id="addking" ondrop="drop(event)" ondragover="allowDrop(event)" class="option box"></span>
+					</div>
+				</div>
+			</div>
+			<div class=" col-sm-4 listdev" id="loobydiv">
+				<h2>Lobby</h2>
+				<table style="width: 100%;">
+					<thead>
+						<th>Name</th>
+						<th>Rank</th>
+						<th>Status</th>
+					</thead>
+					<tbody id="roomlist">
+
+					</tbody>
+				</table>
+			</div>
+			<div class=" col-sm-4 listdev" id="gamehistorydiv">
+				<h2>Game History</h2>
+				<table style="width: 100%;">
+					<thead>
+						<th>PIECE</th>
+						<th>FROM</th>
+						<th>TO</th>
+						<th>CAPTURE</th>
+					</thead>
+					<tbody id="gamehistorylist">
+
+					</tbody>
+				</table>
+			</div>
+			<!-- <div id="userlist" class=" col-sm-2">
+			</div> -->
+
+		</div>
+		<!-- END CHESS CONTAINER -->
+	</section>
+
+	<!-- <footer> -->
+		<!-- <form id="chatform">
+
+			<textarea id="message" placeholder="Write something.."></textarea>
+			<input type="submit" id="submit" value="SEND"/>
+
+		</form> -->		
+	<!-- </footer> -->
+
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="../js/moment.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="../js/chat.js"></script>
+
+	<!-- BEGIN CHESS SCRIPT -->
+	<script type="text/javascript" src="../chess-assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="../chess-assets/js/angular.min.js"></script>
+	<script type="text/javascript" src="../chess-assets/js/action.js"></script>
+	<!-- END CHESS SCRIPT -->
+
+</body>
+
+</html>
