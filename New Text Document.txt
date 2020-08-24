@@ -1,0 +1,314 @@
+{%- assign param = 'constrant' -%}
+
+{%- capture contentForQuerystring -%}{{ content_for_header }}{%- endcapture -%}
+{%- assign pageUrl = contentForQuerystring | split:'"pageurl":"' | last | split:'"' | first | split:'.myshopify.com' | last |
+   replace:'\/','/' | 
+   replace:'%20',' ' | 
+   replace:'\u0026','&'
+-%}
+{%- assign itemShow = '' -%}
+{%- for i in (1..1) -%}
+  {%- unless pageUrl contains "?" -%}{% break %}{%- endunless -%}
+  {%- assign pageQuerystring = pageUrl | split:'?' | last -%}
+  {%- assign parts= pageQuerystring | split:'&' -%}
+  {%- for part in parts -%}
+    {%- assign keyAndValue = part | split:'=' -%}
+    {%- if keyAndValue.size > 1 -%}
+      {% if keyAndValue[0] == param%}
+          {%- assign itemShow = keyAndValue[1]-%}			
+      {% endif%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{% assign mycurrent_tags = itemShow | split:'+' %}            
+
+{% if section.blocks.size > 0 %}   
+{% for block in section.blocks %}      
+{% assign tags = block.settings.shop_by_tags_list | split: ',' %}
+{% assign counter = 0 %}
+{% for t in tags %}
+{% assign tag = t | strip %}
+{% assign tag_value = tag | handleize %}      
+{% if mycurrent_tags contains tag %}            
+{% else %}
+{% if collection.tags contains tag %}             
+{% assign counter = counter | plus:1 %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% if  block.settings.enable_shop_by_tags %}
+{% if  block.settings.shop_by_tags_title != blank %}
+<aside class="sidebar-tag filter tags {{ block.settings.shop_by_tags_title | downcase }} {% if counter == 0 %} counter_zero {% endif %}">          
+  <div class="widget">
+    <h4>
+      <span>{{ block.settings.shop_by_tags_title  }} </span>
+      <a href="javascript:void(0)" class="clear" style="display:none">
+        <i class="fas fa-times"></i>
+      </a>
+    </h4>
+    
+    
+	{% if block.settings.enable_shop_by_search == true %}
+    	<input type="text" placeholder="Search for brand" class="searchinput" onkeyup="searchbrand(this)" style="  width:100%; margin-bottom:0px;">
+    {% endif %}
+    {% if block.settings.enable_shop_by_producttype == true %}
+    	{%- assign prodtypelist = '' -%}
+    		{% paginate collection.products by 100 %}
+    		{% for product in collection.products %}
+    			{%-assign prodtypelist = prodtypelist | append: product.type | append: ';' -%}
+    		{% endfor %}
+    		{% endpaginate %}
+    	{% assign myproducttypes = prodtypelist | remove_last: ';' | split: ';' %}
+    	{% assign producttypes = myproducttypes | uniq | join: ";" %}
+	    {% assign typelist = producttypes | split: ';' %}
+    
+    
+      <div class="widget-content">
+        <ul>             
+          {% for t in typelist %}
+          {% assign tag = t | strip %}
+          {% assign tag_value = tag | handleize %}
+
+          {%- assign tagflag = 0 -%}
+
+          {% for mytag in mycurrent_tags %}
+              {%- assign temp1 = mytag|downcase| handleize -%}
+              {%- assign temp2 = tag|downcase| handleize  -%}
+              {% if temp1 ==  temp2 %}
+                  {%- assign tagflag = 1 -%}
+              {%- endif -%}
+          {%- endfor -%}
+
+          {% if tagflag == 1%}
+          <li>
+            <i></i>
+            <input type="checkbox" value="{{ tag_value }}" checked/>
+            <label>{{ tag  }}</label>
+          </li>
+          {% else %}          
+          <li>
+            <i></i>
+            <input type="checkbox" value="{{ tag_value }}"/>
+            <label>{{ tag }}</label>
+          </li>             
+          {% endif %}
+          {% endfor %}
+
+        </ul>
+      </div>
+    {% else%}
+    {% if block.settings.enable_shop_by_range == true %}
+      	{% assign rangeminprice = block.settings.shop_by_range_min_value %}
+  		{% assign rangemaxprice = block.settings.shop_by_range_max_value %}
+        {% assign minprice = 10 %}
+        {% assign maxprice = 100 %}
+		{% for t in mycurrent_tags %}
+    		{% assign tags =t | split: '-' %}
+    		{% if tags[0] == 'price' %}
+    			{% assign minprice = tags[1] %}
+				{% assign maxprice = tags[2] %}
+    		{% endif %}
+    	{% endfor %}
+    	<div class="widget-content">
+          <div id="slider" minprice="{{minprice}}" maxprice="{{maxprice}}" rangeminprice="{{rangeminprice}}" rangemaxprice="{{rangemaxprice}}"></div>
+          <div  style="display:none" >
+	          <input type="checkbox"  class="pricetag" value="" id="checkvalue"/>
+              <label id="checkvaluecontent" class="pricetag"></label>
+          </div>
+    	</div>
+
+    	<script type="text/javascript">
+     
+     console.log(parseInt({{minprice}}));
+     console.log(parseInt({{maxprice}}));
+     console.log({{rangeminprice}});
+     console.log({{rangemaxprice}});
+      var slider = document.getElementById('slider');  
+      noUiSlider.create(slider, {
+        start: [parseInt({{minprice}}), parseInt({{maxprice}})],
+          step: 1,
+          connect: true,
+          tooltips: true,
+
+          range: {
+              'min': parseInt({{rangeminprice}}),
+              'max': parseInt({{rangemaxprice}})
+          }
+      });  
+     slider.noUiSlider.on('set', function(values) {
+       console.log("arrive");
+        $("#checkvalue").val("price-"+values[0]+'-'+values[1]);
+        $("#checkvaluecontent").text("price-"+values[0]+'-'+values[1]);
+       $("#checkvaluecontent").click();
+       $("#checkvalue").attr('checked', 'checked');
+    });
+
+    </script>    
+    
+    {% else%}
+    <div class="widget-content">
+      <ul>             
+        {% for t in tags %}
+        {% assign tag = t | strip %}
+        {% assign tag_value = tag | handleize %}
+        
+        {%- assign tagflag = 0 -%}
+        
+        {% for mytag in mycurrent_tags %}
+            {%- assign temp1 = mytag|downcase -%}
+            {%- assign temp2 = tag|downcase  -%}
+            {% if temp1 ==  temp2 %}
+                {%- assign tagflag = 1 -%}
+            {%- endif -%}
+        {%- endfor -%}
+        
+        {% if tagflag == 1%}
+        <li>
+          <i></i>
+          <input type="checkbox" value="{{ tag_value }}" checked/>
+          <label>{{ tag  }}</label>
+        </li>
+        {% else %}          
+        <li>
+          <i></i>
+          <input type="checkbox" value="{{ tag_value }}"/>
+          <label>{{ tag }}</label>
+        </li>             
+        {% endif %}
+        {% endfor %}
+
+      </ul>
+    </div>
+    {% endif %}
+    {% endif %}
+  </div>
+</aside>
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
+   
+
+<script>
+//   jQuery(document).ready(function() {
+//     var slider = document.getElementById('slider');  
+//     noUiSlider.create(slider, {
+//         start: [20, 80],
+//         step: 1,
+//         connect: true,
+//         tooltips: true,
+        
+//         range: {
+//             'min': 0,
+//             'max': 100
+//         }
+//     });  
+//    slider.noUiSlider.on('set', function(values) {
+//      console.log("arrive");
+//       $("#checkvalue").val(values[0]+'-'+values[1]);
+//       $("#checkvaluecontent").text(values[0]+'-'+values[1]);
+//      $("#checkvaluecontent").click();
+//      $("#checkvalue").attr('checked', 'checked');
+//   });
+
+//   });
+  
+  
+  
+
+  
+  function searchbrand(mysearch) {
+    console.log($(mysearch)[0].value);
+  var input, filter, table, tr, td, i;
+  input = $(mysearch);
+  filter = $(mysearch)[0].value.toUpperCase();
+  tr = input.parent().children().last().children().last().children();
+  for (i = 0; i < tr.length; i++) {
+    td = $(tr[i]).children().last();
+    if (td) {
+      txtValue = td.text();
+      console.log(txtValue);
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        tr[i].style.display = "";
+      } else {
+        tr[i].style.display = "none";
+      }
+    }
+  }
+}
+</script>
+
+{% schema %}
+
+{
+"name": "Tags",
+"max_blocks": 20,
+"settings": [
+],
+"blocks": [   
+{
+"type": "text",
+"name": "Tags",
+"settings": [
+{     
+
+"type": "checkbox",
+"id": "enable_shop_by_tags",
+"label": "Enable",
+"default": true
+},
+{     
+
+"type": "checkbox",
+"id": "enable_shop_by_search",
+"label": "SearchBox",
+"default": true
+},
+{     
+
+"type": "checkbox",
+"id": "enable_shop_by_range",
+"label": "RangeSlider",
+"default": true
+},
+{     
+
+"type": "checkbox",
+"id": "enable_shop_by_producttype",
+"label": "ProductFilter",
+"default": true
+},
+
+{
+"type": "text",
+"id": "shop_by_tags_title",
+"label": "Shop by tags",
+"default": "Shop By Size",
+"info": "i.e \"Shop by Size\"."
+},
+{
+"type": "text",
+"id": "shop_by_range_min_value",
+"label": "minvalue",
+"default": "1"
+},
+{
+"type": "text",
+"id": "shop_by_range_max_value",
+"label": "maxvalue",
+"default": "100"
+},
+{
+"type": "textarea",
+"id": "shop_by_tags_list",
+"label": "Tags list",
+"info": "Separate by a comma, i.e \"XS, S, M, L, XL\"."
+}
+]
+}
+]
+}
+{% endschema %}
