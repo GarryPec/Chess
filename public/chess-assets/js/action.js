@@ -503,11 +503,11 @@ $(document).ready(function() {
 				
 				//Switch player
 				switchPlayer();
+				sendboarddata();
 		   }
 
 		//    var container = $('.chess-container #game_wrap').html();
 		//    socket.emit('move', container);
-		   sendboarddata();
 		 }
 	}
 	//Get piece and position of the selected piece
@@ -544,6 +544,7 @@ $(document).ready(function() {
 					];
 					nextMoves = getPawnMoves(i, j, color, moves1)
 									.concat(getPawnMoves(i, j, color, moves2));
+					break;
 				case 'king':
 						var moves1 = [
 							[1, 1], [1, -1], [-1, 1], [-1, -1]
@@ -619,16 +620,22 @@ $(document).ready(function() {
 				   if(box.hasClass('placed')) {
 						if(box.attr('piece').indexOf(color) >= 0) {
 							 sugg = false;
-						} else if(count==0 && move[1]!=0 && move[0]!=0){
-							 nextMoves.push([tI, tJ]);
-							 sugg = false;
-						}
-						else
-						{
-							sugg = false;
+						} else
+						{ 
+							if(count==0 && (   (move[1]==1 && move[0]==1)||(move[1]==1 && move[0]==-1)||(move[1]==-1 && move[0]==1)||(move[1]=-1 && move[0]==-1)     )   ){
+								console.log("capturearrive");
+								console.log(move[0]);
+								console.log(move[1]);
+								nextMoves.push([tI, tJ]);
+								sugg = false;
+							}
+							else
+							{
+								sugg = false;
+							}
 						}
 				   }
-				   if(sugg) {
+				   if(sugg == true) {
 						nextMoves.push([tI, tJ]);
 						tI += move[0];
 						tJ += move[1];
@@ -1069,6 +1076,11 @@ $(document).ready(function() {
 		{
 			return;
 		}
+		var listpiece = $(ev.target).parent().attr('piece').split('-');
+		if(listpiece[0]!=player)
+		{
+			return;
+		}
 		checkmovepiece($(ev.target).parent());
 		ev.dataTransfer.setData("text", $(ev.target).parent().attr('id'));
 	}
@@ -1090,21 +1102,27 @@ $(document).ready(function() {
 
 		if($(data).hasClass('ng-scope'))
 		{
-			
-			if($(ev.target).is('img'))
+			var listpiece = $(data).attr('piece').split('-');
+			console.log(player);
+			if(listpiece[0]==player)
 			{
-				var listpiece = $(ev.target).parent().attr('piece').split('-');
-				console.log(listpiece);
-				if(listpiece[0]==player)
-					checkmovepiece($(ev.target).parent());
-			}
-			else
-			{
-				var listpiece = $(ev.target).attr('piece').split('-');
-				console.log(listpiece);
-				if(listpiece[0]==player)
-					checkmovepiece($(ev.target).parent());
-				checkmovepiece($(ev.target));
+				if($(ev.target).is('img'))
+				{
+					// var listpiece = $(ev.target).parent().attr('piece').split('-');
+					// console.log(listpiece);
+					// if(listpiece[0]==player)
+					console.log("droparrive");
+						checkmovepiece($(ev.target).parent());
+				}
+				else
+				{
+					console.log("droparrive");
+					// var listpiece = $(ev.target).attr('piece').split('-');
+					// console.log(listpiece);
+					// if(listpiece[0]==player)
+					// 	checkmovepiece($(ev.target));
+					checkmovepiece($(ev.target));
+				}
 			}
 		}
 		else
