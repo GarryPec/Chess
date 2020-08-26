@@ -81,7 +81,7 @@ $(document).ready(function() {
     
     var colorOption = 0;
     var themeOption = 0;
-    
+    var moveflag = 'black';
     //Change theme
     $('#theme-option').on('click', function() {
         themeOption === themes.length - 1 ? themeOption = 0 : themeOption++;
@@ -207,6 +207,7 @@ $(document).ready(function() {
 			}
 
 		}
+		switchPlayer();
 	});
 
 	socket.on('updatemove',function(data){
@@ -427,10 +428,10 @@ $(document).ready(function() {
 	var checkmovepiece = function(checkbox)
 	{
 		console.log("checkarrive");
-		// if($('#game').attr("flag") != $('#game_wrap').attr("flag"))
-		// {
-		// 	return;
-		// }
+		if($('#game').attr("flag") != moveflag)
+		{
+			return;
+		}
 		 if($(this).hasClass('selected')) { //Undo to select new box
 		   $(this).removeClass('selected');
 
@@ -917,20 +918,20 @@ $(document).ready(function() {
 
 	//Switch player
 	var switchPlayer = function() {
-		if($('.chess-container #game').attr("flag")=="white")
-		{
-			$('.chess-container #game').attr("flag", "black");
-		}
-		else
-		{
-			$('.chess-container #game').attr("flag", "white");
-		}
-		 if(player === 'black') {
+		// if($('.chess-container #game').attr("flag")=="white")
+		// {
+		// 	$('.chess-container #game').attr("flag", "black");
+		// }
+		// else
+		// {
+		// 	$('.chess-container #game').attr("flag", "white");
+		// }
+		 if(moveflag === 'black') {
 			  $('#player').html(schessPieces.white.king);
-			  player = 'white';
+			  moveflag = 'white';
 		 } else {
 			  $('#player').html(schessPieces.black.king);
-			  player = 'black';
+			  moveflag = 'black';
 		 }
 	}
 
@@ -950,9 +951,10 @@ $(document).ready(function() {
 					setNewBoard(box, i, j,playerflag);
 			  }
 		 }
-
-		 //Set global variables to default
 		 player = playerflag;
+		 moveflag = 'black';
+		 //Set global variables to default
+		//  player = playerflag;
 		 select = {
 			  canMove: false,
 			  piece: '',
@@ -960,22 +962,22 @@ $(document).ready(function() {
 		 };
 		 console.log(player);
 		 var option = $('#addboxlist');
-		 option.find('#addpawn').attr('piece',player+'-pawn');
-		 option.find('#addrook').attr('piece',player+'-rook');
-		 option.find('#addqueen').attr('piece',player+'-queen');
-		 option.find('#addking').attr('piece',player+'-king');
-		 option.find('#addknight').attr('piece',player+'-knight');
-		 option.find('#addbknight').attr('piece',player+'-bknight');
-		 option.find('#addbishop').attr('piece',player+'-bishop');
+		 option.find('#addpawn').attr('piece',playerflag+'-pawn');
+		 option.find('#addrook').attr('piece',playerflag+'-rook');
+		 option.find('#addqueen').attr('piece',playerflag+'-queen');
+		 option.find('#addking').attr('piece',playerflag+'-king');
+		 option.find('#addknight').attr('piece',playerflag+'-knight');
+		 option.find('#addbknight').attr('piece',playerflag+'-bknight');
+		 option.find('#addbishop').attr('piece',playerflag+'-bishop');
 
 
-		 option.find('#addpawn').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].pawn+"'>");
-		 option.find('#addrook').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].rook+"'>");
-		 option.find('#addqueen').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].queen+"'>");
-		 option.find('#addking').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].king+"'>");
-		 option.find('#addknight').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].knight+"'>");
-		 option.find('#addbknight').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].bknight+"'>");
-		 option.find('#addbishop').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[player].bishop+"'>");
+		 option.find('#addpawn').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].pawn+"'>");
+		 option.find('#addrook').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].rook+"'>");
+		 option.find('#addqueen').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].queen+"'>");
+		 option.find('#addking').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].king+"'>");
+		 option.find('#addknight').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].knight+"'>");
+		 option.find('#addbknight').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].bknight+"'>");
+		 option.find('#addbishop').html("<img draggable='true' ondragstart='drag(event)' src='../img/chess/"+chessPieces[playerflag].bishop+"'>");
 
 		 historyMoves = [];
 		 promotion = {};
@@ -1063,6 +1065,10 @@ $(document).ready(function() {
 	}
 	  
 	drag = function(ev) {
+		if($('#game').attr("flag") != moveflag)
+		{
+			return;
+		}
 		checkmovepiece($(ev.target).parent());
 		ev.dataTransfer.setData("text", $(ev.target).parent().attr('id'));
 	}
@@ -1071,6 +1077,10 @@ $(document).ready(function() {
 		console.log("drop");
 		console.log(ev.target);
 		ev.preventDefault();
+		if($('#game').attr("flag") != moveflag)
+		{
+			return;
+		}
 		// if($('#game').attr("flag") != $('#game_wrap').attr("flag"))
 		// {
 		// 	return;
@@ -1080,12 +1090,20 @@ $(document).ready(function() {
 
 		if($(data).hasClass('ng-scope'))
 		{
+			
 			if($(ev.target).is('img'))
 			{
-				checkmovepiece($(ev.target).parent());
+				var listpiece = $(ev.target).parent().attr('piece').split('-');
+				console.log(listpiece);
+				if(listpiece[0]==player)
+					checkmovepiece($(ev.target).parent());
 			}
 			else
 			{
+				var listpiece = $(ev.target).attr('piece').split('-');
+				console.log(listpiece);
+				if(listpiece[0]==player)
+					checkmovepiece($(ev.target).parent());
 				checkmovepiece($(ev.target));
 			}
 		}
