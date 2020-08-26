@@ -180,11 +180,14 @@ module.exports = function(app,io){
 				}
 			}
 			var user = findClientbySocket(socket);
-			for (let index = 0; index < users.length; index++) {
-				const element = users[index];
-				if(element.name == user.name)
-				{
-					users.splice(index,1);
+			if(user != null)
+			{
+				for (let index = 0; index < users.length; index++) {
+					const element = users[index];
+					if(element.name == user.name)
+					{
+						users.splice(index,1);
+					}
 				}
 			}
 			socket.broadcast.to(socket.room).emit('leaveroom', {
