@@ -51,6 +51,7 @@ $(function(){
 	socket.on('connect', function(){
 
 		section.children().css('display','none');
+		$("#gamebody").css('display','none');
 		onConnect.css('display','block');
 		loginForm.on('submit', function(e){
 
