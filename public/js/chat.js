@@ -145,7 +145,7 @@ $(function(){
 		}
 		else{
 			$('.chess-container #game_wrap').attr("flag", "white");
-			$('.chess-container #game').attr("flag", "black");
+			$('.chess-container #game').attr("flag", "white");
 			// $('#game').css('transform', 'rotate(180deg)');
 			// $('#game .box').css('transform', 'rotate(180deg)');
 		}
