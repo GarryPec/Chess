@@ -5,7 +5,7 @@ $(function(){
 	// getting the id of the room from the url
 	var socket = io();
 	var socketid;
-	var roomid;
+	var roomid=0;
 	// variables which hold the data for each person
 	var name = "",
 		email = "",
@@ -80,22 +80,31 @@ $(function(){
 		backbutton.on('click',function(e)
 		{
 			socket.emit('leaveroom', id);
+			roomid = 0;
 		});
 		
 		createbutton.on('click',function(e)
 		{
-			createbutton.attr('disabled', 'disabled');
-			socket.emit('createroom', socketid);
+			if(roomid==0)
+			{
+				createbutton.attr('disabled', 'disabled');
+				socket.emit('createroom', socketid);
+			}
 		});
 		roomitem.on('click',function(e)
 		{
-			var id = $(this).attr("dataid");
-			socket.emit('joinroom', parseInt(id));
+			if(roomid==0)
+			{
+				id = $(this).attr("dataid");
+				roomid = $(this).attr("dataid");
+				socket.emit('joinroom', parseInt(id));
+			}
 		});
 		
 	});
 	socket.on('create', function(data){
 		id = data.roomid;
+		roomid = data.roomid;
 		footer.fadeIn(1200);
 		createbutton.attr('disabled', 'disabled');
 		// footer.fadeIn(1200);
@@ -115,6 +124,7 @@ $(function(){
 		$("#loobydiv").hide();
 		$("#gamehistorydiv").show();
 		id = data.roomid;
+		roomid = data.roomid;
 		footer.fadeIn(1200);
 
 	// 	setTimeout(function() {
@@ -173,10 +183,10 @@ $(function(){
 
 	socket.on('leaveroom',function(data){
 		if(data.boolean && id==data.room){
-			createbutton.removeattr('disabled');
 			$("#loobydiv").show();
 			$("#gamehistorydiv").hide();
 			footer.fadeOut(1200);
+			roomid=0;
 		}
 
 	});
