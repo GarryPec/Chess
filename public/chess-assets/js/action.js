@@ -143,6 +143,10 @@ $(document).ready(function() {
 		resetGame();
 
 	});
+	socket.on('win',function(data){
+		showWinner(data);
+
+	});
 
 	socket.on('chessboard',function(data){
 		mySound.play();
@@ -206,7 +210,7 @@ $(document).ready(function() {
 	});
 
 	socket.on('updatemove',function(data){
-
+		console.log("updatemovearrive");
 		var move = {
 			previous: {},
 			current: {}
@@ -474,20 +478,28 @@ $(document).ready(function() {
 				move.current.piece = checkbox.attr('piece');
 				move.current.box = checkbox.attr('id');
 
-				historyMoves.push( move );
 
+				socket.emit('updatemove', {user:$('#game').attr("flag"),From:select.box,To:move.current.box,piece:select.piece,capture:move.current.piece});
+				historyMoves.push( move );
+				showHistory();
+				
+				console.log(searchking);
+				var searchking = checkbox.attr('piece').split('-');
+				if(searchking[1]=='king')
+				{
+					socket.emit('win',searchking[0] );
+					showWinner(player);
+				}
 				//Move selected piece successfully
 				setPiece(checkbox, color, type);
 
 				//Delete moved box
 				deleteBox($('#' + select.box));
 
-				socket.emit('updatemove', {user:$('#game').attr("flag"),From:select.box,To:move.current.box,piece:select.piece,capture:move.current.piece});
-				showHistory();
 				$('.box').removeClass('suggest');
 
 				select = { canMove: false, piece: '', box: '' };
-
+				
 				//Switch player
 				switchPlayer();
 		   }
@@ -967,10 +979,12 @@ $(document).ready(function() {
 
 		 historyMoves = [];
 		 promotion = {};
+		 $("#gamehistorylist").html("");
 	}
 	var showHistory = function()
 	{
 		var historysection = $("#gamehistorylist");
+		historysection.html("");
 		for (let index = 0; index < historyMoves.length; index++) {
 			const element = historyMoves[index];
 
@@ -1054,6 +1068,8 @@ $(document).ready(function() {
 	}
 	
 	drop = function(ev) {
+		console.log("drop");
+		console.log(ev.target);
 		ev.preventDefault();
 		// if($('#game').attr("flag") != $('#game_wrap').attr("flag"))
 		// {
