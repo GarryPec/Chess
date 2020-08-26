@@ -189,7 +189,7 @@ module.exports = function(app,io){
 			socket.leave(socket.room);
 		});
 		socket.on('leaveroom', function() {
-
+			console.log('leaveroom');
 			// Notify the other person in the chat room
 			// that his partner has left
 			for (let index = 0; index < rooms.length; index++) {
@@ -202,13 +202,11 @@ module.exports = function(app,io){
 			var user = findClientbySocket(socket);
 			socket.broadcast.to(socket.room).emit('leaveroom', {
 				boolean: true,
-				room: socket.room,
-				user: user.name
+				room: socket.room
 			});
 			socket.emit('leaveroom', {
 				boolean: true,
-				room: socket.room,
-				user: user.name
+				room: socket.room
 			});
 			sendallroomlist();
 		});
@@ -224,6 +222,10 @@ module.exports = function(app,io){
 		socket.on('move', function(data){
 			console.log('move');
 			socket.broadcast.to(socket.room).emit('movestate', data);
+		});
+		socket.on('win', function(data){
+			console.log('move');
+			socket.broadcast.to(socket.room).emit('win', data);
 		});
 		socket.on('chessboard', function(data){
 			console.log('chessboard');
