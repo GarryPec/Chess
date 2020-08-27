@@ -1006,7 +1006,7 @@ $(document).ready(function() {
 		   var temp = 'a'+parseInt(fromlist[1]);
 		   console.log(temp);
 			historysection.append($('<tr class = "historyitem"></tr>')
-				.html('<td>'+element.previous.piece+'</td><td>'+showchar(parseInt(fromlist[1]))+' '+(parseInt(fromlist[2])+1).toString()+'</td><td>'+showchar(parseInt(tolist[1]))+' '+(parseInt(tolist[2])+1).toString()+'</td><td>'+element.current.piece+'</td>')
+				.html('<td>'+element.previous.piece+'</td><td>'+showchar(parseInt(fromlist[1]))+' '+(16-parseInt(fromlist[2])).toString()+'</td><td>'+showchar(parseInt(tolist[1]))+' '+(16-parseInt(tolist[2])).toString()+'</td><td>'+element.current.piece+'</td>')
 				);			
 		}
 	}
