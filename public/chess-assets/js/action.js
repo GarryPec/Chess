@@ -1079,10 +1079,13 @@ $(document).ready(function() {
 		var listpiece = $(ev.target).parent().attr('piece').split('-');
 		if(listpiece[0]!=player)
 		{
+			ev.dataTransfer.setData("text", null);
 			return;
 		}
-		checkmovepiece($(ev.target).parent());
-		ev.dataTransfer.setData("text", $(ev.target).parent().attr('id'));
+		else{
+			checkmovepiece($(ev.target).parent());
+			ev.dataTransfer.setData("text", $(ev.target).parent().attr('id'));
+		}
 	}
 	
 	drop = function(ev) {
@@ -1098,6 +1101,8 @@ $(document).ready(function() {
 		// 	return;
 		// }
 		var dataid = ev.dataTransfer.getData("text");
+		if(dataid == null)
+			return;
 		var data = document.getElementById(dataid);
 
 		if($(data).hasClass('ng-scope'))
@@ -1127,16 +1132,16 @@ $(document).ready(function() {
 		}
 		else
 		{
-			if(!$(ev.target).is('img'))
-			{
-				$(ev.target).html($(data).first().html());
-				$(ev.target).attr('piece',$(data).first().attr('piece'));
-				switchPlayer();
-				// var container = $('.chess-container #game_wrap').html();
-				// socket.emit('move', container);
-				sendboarddata();
-				socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:$(ev.target).attr('id'),piece:$(data).first().attr('piece'),capture:""});
-			}
+			// if(!$(ev.target).is('img'))
+			// {
+			// 	$(ev.target).html($(data).first().html());
+			// 	$(ev.target).attr('piece',$(data).first().attr('piece'));
+			// 	switchPlayer();
+			// 	// var container = $('.chess-container #game_wrap').html();
+			// 	// socket.emit('move', container);
+			// 	sendboarddata();
+			// 	socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:$(ev.target).attr('id'),piece:$(data).first().attr('piece'),capture:""});
+			// }
 		}
 		mySound.play();		
 	}
