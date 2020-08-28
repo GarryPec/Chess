@@ -1072,10 +1072,17 @@ $(document).ready(function() {
 	}
 	  
 	drag = function(ev) {
+		console.log(ev.target);
 		if($('#game').attr("flag") != moveflag)
 		{
-			return;
+			return false;
 		}
+		if(!$(ev.target).is('img'))
+			return false;
+
+		var emptyImage = document.createElement('img');
+		emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  		ev.dataTransfer.setDragImage(emptyImage, 0, 0);
 		var listpiece = $(ev.target).parent().attr('piece').split('-');
 		if(listpiece[0]!=player)
 		{
