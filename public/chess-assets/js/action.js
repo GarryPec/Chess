@@ -138,7 +138,13 @@ $(document).ready(function() {
        colorOption === colors.length - 1 ? colorOption = 0 : colorOption++;
         
         setColor();
-    });
+	});
+	$('img').on('dragstart', function (event) {
+	var emptyImage = document.createElement('img');
+	// Set the src to be a 0x0 gif
+	emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+	event.dataTransfer.setDragImage(emptyImage, 0, 0);
+	});
     socket.on('leaveroom',function(data){
 		resetGame();
 
@@ -1072,6 +1078,9 @@ $(document).ready(function() {
 	}
 	  
 	drag = function(ev) {
+		var emptyImage = document.createElement('img');
+		emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+  		ev.dataTransfer.setDragImage(emptyImage, 0, 0);
 		console.log(ev.target);
 		if($('#game').attr("flag") != moveflag)
 		{
@@ -1080,9 +1089,6 @@ $(document).ready(function() {
 		if(!$(ev.target).is('img'))
 			return false;
 
-		var emptyImage = document.createElement('img');
-		emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-  		ev.dataTransfer.setDragImage(emptyImage, 0, 0);
 		var listpiece = $(ev.target).parent().attr('piece').split('-');
 		if(listpiece[0]!=player)
 		{
