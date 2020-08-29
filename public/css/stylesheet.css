@@ -127,6 +127,7 @@ x
 }
 #createbutton {
 	/* padding-top: 28px; */
+	background-color: white;
 }
 #little {
 	font-weight: normal;
@@ -134,7 +135,7 @@ x
 }
 #big {
 	font-weight: bold;
-	font-size: 23px;
+	font-size: 16px;
 }
 .tutorial{
 	margin-bottom:90px;
