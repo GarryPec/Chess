@@ -231,15 +231,13 @@ $(document).ready(function() {
 	   if(data.From == 'new')
 	   {
 		move.previous.box = 'new';
-		move.current.piece = "";
 	   }
 	   else
 	   {
 		var idlist = data.From.split("-");
 		move.previous.box = "box-"+(15-parseInt(idlist[1])).toString()+"-"+(15-parseInt(idlist[2])).toString();
-		move.current.piece = data.capture;
 	   }
-	   
+	   move.current.piece = data.capture;	   
 	   var idlist = data.To.split("-");
 	   move.current.box = "box-"+(15-parseInt(idlist[1])).toString()+"-"+(15-parseInt(idlist[2])).toString();
 
@@ -1023,8 +1021,6 @@ $(document).ready(function() {
 		   if(element.previous.box == 'new')
 		   {
 			var tolist = element.current.box.split('-');
-			var temp = 'a'+parseInt(fromlist[1]);
-			console.log(temp);
 			 historysection.append($('<tr class = "historyitem"></tr>')
 				 .html('<td>'+element.previous.piece+'</td><td> new </td><td>'+showchar(parseInt(tolist[1]))+' '+(16-parseInt(tolist[2])).toString()+'</td><td>'+element.current.piece+'</td>')
 				 );			
@@ -1194,10 +1190,38 @@ $(document).ready(function() {
 			   move.current.box = $(ev.target).attr('id');
 
 
-			   socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:move.current.box,piece:select.piece,capture:move.current.piece});
+			   socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:move.current.box,piece:select.piece,capture:""});
 			   historyMoves.push( move );
 			   showHistory();
 				// socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:$(ev.target).attr('id'),piece:$(data).first().attr('piece'),capture:$(ev.target).attr('piece')});
+			}
+			else
+			{
+
+
+
+
+				var move = {
+					previous: {},
+					current: {}
+			   }
+
+			   move.previous.piece = $(data).first().attr('piece');
+			   move.previous.box = 'new';
+
+			   move.current.piece = $(ev.target).parent().attr('piece');
+			   move.current.box = $(ev.target).parent().attr('id');
+
+
+			   socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:move.current.box,piece:select.piece,capture:move.current.piece});
+			   historyMoves.push( move );
+			   showHistory();
+			   $(ev.target).parent().attr('piece',$(data).first().attr('piece'));
+			   $(ev.target).parent().html($(data).first().html());
+			   switchPlayer();
+			   // var container = $('.chess-container #game_wrap').html();
+			   // socket.emit('move', container);
+			   sendboarddata();
 			}
 		}
 		mySound.play();		
