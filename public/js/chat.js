@@ -90,6 +90,8 @@ $(function(){
 			{
 				createbutton.attr('disabled', 'disabled');
 				socket.emit('createroom', socketid);
+				$("#loobydiv").hide();
+				$("#gamehistorydiv").show();
 			}
 		});
 		roomitem.on('click',function(e)
