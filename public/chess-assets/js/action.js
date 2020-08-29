@@ -9,7 +9,10 @@ angular.module('myApp', []).controller('GameController', ['$scope', function($sc
         $scope.widths.push(i);
     }
 }]);
-
+// document.addEventListener("dragstart", function( event ) {
+// 	dragged = event.target;
+// 	event.dataTransfer.setDragImage(dragged, 11111110, 10);
+// }, false);
 $(document).ready(function() { 
 	var  mySound = new sound("../sound/move.mp3");
 	var socket = io(); 
@@ -224,9 +227,19 @@ $(document).ready(function() {
 	   }
 
 	   move.previous.piece = data.piece;
-	   var idlist = data.From.split("-");
-	   move.previous.box = "box-"+(15-parseInt(idlist[1])).toString()+"-"+(15-parseInt(idlist[2])).toString();
-	   move.current.piece = data.capture;
+	  
+	   if(data.From == 'new')
+	   {
+		move.previous.box = 'new';
+		move.current.piece = "";
+	   }
+	   else
+	   {
+		var idlist = data.From.split("-");
+		move.previous.box = "box-"+(15-parseInt(idlist[1])).toString()+"-"+(15-parseInt(idlist[2])).toString();
+		move.current.piece = data.capture;
+	   }
+	   
 	   var idlist = data.To.split("-");
 	   move.current.box = "box-"+(15-parseInt(idlist[1])).toString()+"-"+(15-parseInt(idlist[2])).toString();
 
@@ -1007,6 +1020,17 @@ $(document).ready(function() {
 				previous: {},
 				current: {}
 		   }
+		   if(element.previous.box == 'new')
+		   {
+			var tolist = element.current.box.split('-');
+			var temp = 'a'+parseInt(fromlist[1]);
+			console.log(temp);
+			 historysection.append($('<tr class = "historyitem"></tr>')
+				 .html('<td>'+element.previous.piece+'</td><td> new </td><td>'+showchar(parseInt(tolist[1]))+' '+(16-parseInt(tolist[2])).toString()+'</td><td>'+element.current.piece+'</td>')
+				 );			
+		   }
+		   else
+		   {
 		   var fromlist = element.previous.box.split('-');
 		   var tolist = element.current.box.split('-');
 		   var temp = 'a'+parseInt(fromlist[1]);
@@ -1014,6 +1038,7 @@ $(document).ready(function() {
 			historysection.append($('<tr class = "historyitem"></tr>')
 				.html('<td>'+element.previous.piece+'</td><td>'+showchar(parseInt(fromlist[1]))+' '+(16-parseInt(fromlist[2])).toString()+'</td><td>'+showchar(parseInt(tolist[1]))+' '+(16-parseInt(tolist[2])).toString()+'</td><td>'+element.current.piece+'</td>')
 				);			
+		   }
 		}
 	}
 	var showchar = function(num)
@@ -1074,6 +1099,7 @@ $(document).ready(function() {
 	}
 
 	allowDrop = function(ev) {
+
 		ev.preventDefault();
 	}
 	  
@@ -1143,18 +1169,36 @@ $(document).ready(function() {
 				}
 			}
 		}
-		else
+		else if($(data).hasClass('addpiece'))
 		{
-			// if(!$(ev.target).is('img'))
-			// {
-			// 	$(ev.target).html($(data).first().html());
-			// 	$(ev.target).attr('piece',$(data).first().attr('piece'));
-			// 	switchPlayer();
-			// 	// var container = $('.chess-container #game_wrap').html();
-			// 	// socket.emit('move', container);
-			// 	sendboarddata();
-			// 	socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:$(ev.target).attr('id'),piece:$(data).first().attr('piece'),capture:""});
-			// }
+			if(!$(ev.target).is('img'))
+			{
+				$(ev.target).html($(data).first().html());
+				$(ev.target).attr('piece',$(data).first().attr('piece'));
+				switchPlayer();
+				// var container = $('.chess-container #game_wrap').html();
+				// socket.emit('move', container);
+				sendboarddata();
+
+
+
+				var move = {
+					previous: {},
+					current: {}
+			   }
+
+			   move.previous.piece = $(data).first().attr('piece');
+			   move.previous.box = 'new';
+
+			   move.current.piece = $(ev.target).attr('piece');
+			   move.current.box = $(ev.target).attr('id');
+
+
+			   socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:move.current.box,piece:select.piece,capture:move.current.piece});
+			   historyMoves.push( move );
+			   showHistory();
+				// socket.emit('updatemove', {user:$('#game').attr("flag"),From:'new',To:$(ev.target).attr('id'),piece:$(data).first().attr('piece'),capture:$(ev.target).attr('piece')});
+			}
 		}
 		mySound.play();		
 	}
